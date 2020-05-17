@@ -30,8 +30,11 @@ class Login:
     def loginFunc(self):
         if(self.user.get() =='Peeyush' and self.password.get() == "11111111"):
             messagebox.showinfo("Info", f"welcome {self.user.get()} and your password is : {self.password.get()}")
+            self.root.destroy()
+            import software
+            software.FileApp()
         else:
-            messagebox.showerror("OOOOPPSSSS!!! Its an error!! You are an UNKNOWN person")
+            messagebox.showerror("OOOOPPSSSS!!!"," Its an error!! You are an UNKNOWN person")
 
 
     #for clear

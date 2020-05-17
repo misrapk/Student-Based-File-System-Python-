@@ -3,8 +3,8 @@ from tkinter import ttk, messagebox
 import time,os
 
 class FileApp:
-    def __init__(self,root):
-        self.root=root
+    def __init__(self):
+        self.root=Tk()
         self.root.title("File Based Record System")
         self.root.geometry("1330x700+0+0")
 
@@ -98,13 +98,13 @@ class FileApp:
         btnSave = Button(btnframe, text="Save", font = "arial 15 bold",
         		bd=7,width=18,  command=self.saveData).grid(row=0,column=0,padx=10,pady=10)
  
-        btnDelete = Button(btnframe, text="Delete", font = "arial 15 bold",
+        btnDelete = Button(btnframe, text="Delete",command=self.delete, font = "arial 15 bold",
         		bd=7,width=18).grid(row=0,column=1,padx=10,pady=10)
-        btnClear = Button(btnframe, text="Clear", font = "arial 15 bold",
+        btnClear = Button(btnframe, text="Clear",command=self.fClear, font = "arial 15 bold",
         		bd=7,width=18).grid(row=0,column=2,padx=10,pady=10)
-        btnLogout = Button(btnframe, text="Log Out", font = "arial 15 bold",
+        btnLogout = Button(btnframe, text="Log Out",command = self.logout,font = "arial 15 bold",
         		bd=7,width=18).grid(row=0,column=3,padx=10,pady=10)
-        btnExit = Button(btnframe, text="Exit/Quit", font = "arial 15 bold",
+        btnExit = Button(btnframe, text="Exit/Quit",command = self.exitFun,font = "arial 15 bold",
         		bd=7,width=18).grid(row=0,column=4,padx=10,pady=10)
 
 
@@ -122,32 +122,39 @@ class FileApp:
         scroll_y.pack(side=RIGHT,fill=Y)
         scroll_y.config(command=self.fileList.yview)
         self.fileList.pack(fill=BOTH, expand=1)
-        self.fileList.bind("<ButttonRelease-1>", self.getData)
+        self.fileList.bind("<ButtonRelease-1>",self.getData)
         self.showFiles()
+        self.root.mainloop()
 
 
     def saveData(self):
-        if self.sid.get() == "":
-            messagebox.showerror("Error!!!  Student ID must be requird")
+        present="no"
+        if self.sid.get() =="":
+            messagebox.showerror("Error","Student ID Must be required")
         else:
-            f=open("files/"+str(self.sid.get())+".txt","w")
-            f.write(
-
-                str(self.sid.get())+","+
-                str(self.name.get())+","+
-                str(self.course.get())+","+
-                str(self.address.get())+","+
-                str(self.city.get())+","+
-                str(self.contact.get())+","+
-                str(self.date.get())+","+
-                str(self.degree.get())+","+
-                str(self.proof.get())+","+
-                str(self.payment.get())
-                )
-
-            f.close()
-            messagebox.showinfo("Success,, Record has been SAVED!")
-            self.showFiles()
+            f=os.listdir("files/")
+            if len(f)>0:
+                for i in f:
+                    #split because 101.txt is file name
+                    if i.split(".")[0]==self.sid.get():
+                        present ="yes"
+                if present =="yes":
+                    ask = messagebox.askyesno("Update","File already present \nDo you really want to")
+                    if ask>0:
+                        self.saveFiles()
+                        messagebox.showinfo("Update","Record has updated successfully.")
+                        self.showFiles()
+                        
+                else:
+                    self.saveFiles()
+                    messagebox.showinfo("Saved","Record has saved successfully.")
+                    self.showFiles()
+            else:
+                self.saveFiles()
+                messagebox.showinfo("Saved","Record has saved successfully.")
+                self.showFiles()
+                
+        
 
     #function to show the files
     def showFiles(self):
@@ -165,6 +172,86 @@ class FileApp:
         value=[]
         for f in f1:
             value=f.split(",")
-root=Tk()
-ob=FileApp(root)
-root.mainloop()
+
+        self.sid.set(value[0])
+        self.name.set(value[1])
+        self.course.set(value[2])
+        self.address.set(value[3])
+        self.city.set(value[4])
+        self.contact.set(value[5])
+        self.date.set(value[6])
+        self.degree.set(value[7])
+        self.proof.set(value[8])
+        self.payment.set(value[9])
+
+
+
+
+    def fClear(self):
+        self.sid.set("")
+        self.name.set("")
+        self.course.set("")
+        self.address.set("")
+        self.city.set("")
+        self.contact.set("")
+        self.date.set("")
+        self.degree.set("")
+        self.proof.set("")
+        self.payment.set("")
+
+
+    def delete(self):
+        present="no"
+        if self.sid.get() =="":
+            messagebox.showerror("Error","Student ID Must be required")
+        else:
+            f=os.listdir("files/")
+            if len(f)>0:
+                for i in f:
+                    #split because 101.txt is file name
+                    if i.split(".")[0]==self.sid.get():
+                        present ="yes"
+                if present =="yes":
+                    ask = messagebox.askyesno("Delete","Do You want to confirm?")
+                    if ask>0:
+                        os.remove("files/" + self.sid.get()+".txt")
+                        messagebox.showinfo("","Success!")
+                        self.showFiles()
+
+                    else:
+                        messagebox.showerror("Error","File Not Found")
+
+
+    def saveFiles(self):
+        f=open("files/"+str(self.sid.get())+".txt","w")
+        f.write(
+
+                str(self.sid.get())+","+
+                str(self.name.get())+","+
+                str(self.course.get())+","+
+                str(self.address.get())+","+
+                str(self.city.get())+","+
+                str(self.contact.get())+","+
+                str(self.date.get())+","+
+                str(self.degree.get())+","+
+                str(self.proof.get())+","+
+                str(self.payment.get())
+                )
+
+        f.close()
+        self.showFiles()
+
+
+    #for exit
+
+    def exitFun(self):
+        ask = messagebox.askyesno("Exit", "Do you really want to Exit?")
+        if ask>0:
+            self.root.destroy()
+
+    #for logout
+    def logout(self):
+        self.root.destroy()
+        import login
+
+
